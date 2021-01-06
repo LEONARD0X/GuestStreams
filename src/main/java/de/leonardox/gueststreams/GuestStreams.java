@@ -12,8 +12,7 @@ import org.javacord.api.entity.permission.PermissionsBuilder;
 
 public class GuestStreams implements Consumer<DiscordApi> {
 
-	// Your token here
-	public static final String TOKEN = "";
+	public static final String TOKEN = ""; // Your token here
 
 	@Override
 	public void accept(DiscordApi api) {
@@ -25,19 +24,14 @@ public class GuestStreams implements Consumer<DiscordApi> {
 				return;
 			}
 
-			PermissionsBuilder builder = null;
-			if (channel.getOverwrittenPermissions().containsKey(event.getUser().getId())) {
-				builder = new PermissionsBuilder(channel.getOverwrittenPermissions().get(event.getUser().getId()));
-			} else {
-				builder = new PermissionsBuilder();
-			}
-
-			// Indicates that the member already has the permission to view this channel
-			if (builder.getState(PermissionType.CONNECT) == PermissionState.ALLOWED) {
+			// Check if member already has the permission to view this channel
+			if (channel.getEffectivePermissions(event.getUser())
+					.getState(PermissionType.READ_MESSAGES) == PermissionState.ALLOWED) {
 				return;
 			}
 
 			// Add temporary permissions to view and start steams
+			PermissionsBuilder builder = new PermissionsBuilder();
 			builder.setState(PermissionType.STREAM, PermissionState.ALLOWED);
 			builder.setState(PermissionType.READ_MESSAGES, PermissionState.ALLOWED);
 			new ServerChannelUpdater(channel).addPermissionOverwrite(event.getUser(), builder.build()).update();
@@ -51,15 +45,8 @@ public class GuestStreams implements Consumer<DiscordApi> {
 				return;
 			}
 
-			PermissionsBuilder builder = null;
-			if (channel.getOverwrittenPermissions().containsKey(event.getUser().getId())) {
-				builder = new PermissionsBuilder(channel.getOverwrittenPermissions().get(event.getUser().getId()));
-			} else {
-				builder = new PermissionsBuilder();
-			}
-
-			// Indicates that the member does not have temporary permissions
-			if (builder.getState(PermissionType.CONNECT) == PermissionState.ALLOWED) {
+			// Check if member does not have temporary permissions
+			if (!channel.getOverwrittenPermissions().containsKey(event.getUser().getId())) {
 				return;
 			}
 
