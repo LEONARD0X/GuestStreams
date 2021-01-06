@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.leonardox.gueststreams</groupId>
   <artifactId>gueststream</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>GuestSteams</name>
+  <version>1.0</version>
+  <name>GuestStreams</name>
   <dependencies>
       <dependency>
           <groupId>org.javacord</groupId>
@@ -14,17 +14,37 @@
   </dependencies>
   <build>
     <plugins>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-shade-plugin</artifactId>
-      <version>3.2.4</version>
-      <executions>
-          <execution>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+            <execution>
               <phase>package</phase>
               <goals>
                   <goal>shade</goal>
               </goals>
-          </execution>
-      </executions>
+              <configuration>
+                <minimizeJar>true</minimizeJar>
+                <filters>
+                    <filter>
+                        <artifact>*:*</artifact>
+                        <excludes>
+                            <exclude>META-INF/*.SF</exclude>
+                            <exclude>META-INF/*.DSA</exclude>
+                            <exclude>META-INF/*.RSA</exclude>
+                        </excludes>
+                    </filter>
+                </filters>
+                <transformers>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>de.leonardox.gueststreams.GuestStreams</mainClass>
+                  </transformer>
+                </transformers>
+              </configuration>
+            </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <properties>
